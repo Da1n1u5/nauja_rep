@@ -1,0 +1,14 @@
+* Make sure your RabbitMQ client versions matches your RabbitMQ server version. To see client versions available go to:
+     http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.rabbitmq%22%20AND%20a%3A%22amqp-client%22
+     
+* If you need to change client version, set it in pom.xml and use manage-libs.xml with Ant to download new libraries. 
+  Refresh and update project build path afterwards. 
+  
+ * To enable RabbitMQ web management plugin you may need to invoke:
+     rabbitmq-plugins enable rabbitmq_management
+     
+   The web UI then can be found at:
+     http://localhost:15672/ 
+     uname: guest 
+     pwd: guest
+     
