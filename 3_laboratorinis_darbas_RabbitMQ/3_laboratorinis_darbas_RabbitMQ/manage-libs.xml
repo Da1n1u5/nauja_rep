@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project 
+	name="t120b180-mq-libs" 
+	basedir="./" 
+	default="update">
+	
+	<!-- define common parameters -->
+	<property name="libDir"     value="./lib/maven/lib"/>
+	<property name="srcDir"     value="./lib/maven/src"/>
+	<property name="javadocDir" value="./lib/maven/javadoc"/>
+	
+	<!-- pull in OS and environment specific properties -->
+	<property file="manage-libs.properties"/>
+	
+	<!-- define cleanup tasks -->
+	<target name="clean-lib">
+		<delete>
+			<fileset dir="${libDir}" includes="**/*.*" excludes=".keep"/>
+		</delete>
+	</target>
+	
+	<target name="clean-src">
+		<delete>
+			<fileset dir="${srcDir}" includes="**/*.*" excludes=".keep"/>
+		</delete>
+	</target>
+	
+	<target name="clean-javadoc">
+		<delete>
+			<fileset dir="${javadocDir}" includes="**/*.*" excludes=".keep"/>
+		</delete>
+	</target>
+	
+	<!-- define library pull task -->
+	<target name="pull-lib" depends="clean-lib">
+		<!-- pull in libraries via Maven -->
+		<exec executable="${mvn}">
+			<arg value="clean"/>
+			<arg value="dependency:copy-dependencies"/>
+			<arg value="-DoutputDirectory=${libDir}"/>
+		</exec>
+	</target>
+	
+	<!-- define sources pull task -->
+	<target name="pull-src" depends="clean-src">
+		<!-- pull in sources via Maven -->
+		<exec executable="${mvn}">
+			<arg value="clean"/>
+			<arg value="dependency:sources"/>
+		</exec>
+		
+		<exec executable="${mvn}">
+			<arg value="dependency:resolve"/>
+			<arg value="-Dclassifier=javadoc"/>
+		</exec>
+		
+		<exec executable="${mvn}">
+			<arg value="clean"/>
+			<arg value="dependency:copy-dependencies"/>
+			<arg value="-Dclassifier=sources"/>
+			<arg value="-DoutputDirectory=${srcDir}"/>
+		</exec>
+	</target>
+	
+	<!-- define javadoc pull task -->
+	<target name="pull-javadoc" depends="clean-javadoc">
+		<!-- pull in javadocs via Maven -->
+		<exec executable="${mvn}">
+			<arg value="clean"/>
+			<arg value="dependency:sources"/>
+		</exec>
+		
+		<exec executable="${mvn}">
+			<arg value="dependency:resolve"/>
+			<arg value="-Dclassifier=javadoc"/>
+		</exec>
+		
+		<exec executable="${mvn}">
+			<arg value="clean"/>
+			<arg value="dependency:copy-dependencies"/>
+			<arg value="-Dclassifier=javadoc"/>
+			<arg value="-DoutputDirectory=${javadocDir}"/>
+		</exec>
+	</target>
+	
+	<!-- define general update task, if javadocs are needed, add ",pull-javadoc" to "depends" -->
+	<target name="update" depends="pull-lib, pull-src, pull-javadoc"/>
+</project>
